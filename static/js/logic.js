@@ -21,6 +21,12 @@ function initialize()
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
+    // create topo layer
+    var topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 20, //17
+        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    });
+
     // create gray scale layer
     var gray_scale = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
         attribution: 'Gray Scale map sourced from <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -39,17 +45,11 @@ function initialize()
         ext: 'jpg'
     }); */
 
-    // create topo layer
-    var topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 20, //17
-        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-    });
-
     // create base map
     let base_map = {Default: default_map, GrayScale: gray_scale, OpenTopoMap:topoMap};
 
     // create map object
-    var quake_map = L.map("map", {center: [36, 138], zoom: 4, layers: [gray_scale, default_map, topoMap]});
+    var quake_map = L.map("map", {center: [36, 138], zoom: 4, layers: [topoMap, gray_scale, default_map]});
 
     // add the default map to the map
     default_map.addTo(quake_map);
