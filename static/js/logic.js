@@ -49,23 +49,24 @@ function initialize()
     let base_map = {Default: default_map, GrayScale: gray_scale, OpenTopoMap:topoMap};
 
     // create map object
-    var quake_map = L.map("map", {center: [36, 138], zoom: 3, layers: [gray_scale, default_map, topoMap]});
+    var quake_map = L.map("map", {center: [36, 138], zoom: 4, layers: [gray_scale, default_map, topoMap]});
 
     // add the default map to the map
     default_map.addTo(quake_map);
+    
+    // set up layers and draw earthquake markers and tectonic plates
     let tectonic_layer = new L.LayerGroup();
     let quake_layer = new L.layerGroup();
-    // draw tectonic plates
     d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(tectonic_json => {
         //let tectonic_layer = new L.LayerGroup();
         draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map);
     });
-
-    // draw quakes
     d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(quake_json => {
         draw_quake_markers(quake_json, quake_layer, quake_map);
+        console.log(quake_json);
     });
 
+    // add quake and plate check boxes to the layer control
     let overlays = {
         "Tectonic Plates": tectonic_layer,
         "Earthquakes": quake_layer
@@ -120,9 +121,18 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
         },
         style: dataStyle,
         onEachFeature: function(feature, layer){
+            let lat = feature.geometry.coordinates[1];
+            let long = feature.geometry.coordinates[0];
+            let north_south = "north";
+            let east_west = "east";
+            if (lat < 0) {north_south = "south";}
+            if (long < 0) {east_west = "west";}
+            lat = Math.abs(lat).toFixed(1);
+            long = Math.abs(long).toFixed(1);
             layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
                             Depth:<b>${feature.geometry.coordinates[2]}</b><br>
-                            Location: <b>${feature.properties.place}</b>`);
+                            Location: <b>${feature.properties.place}</b><br>
+                            Coordinates: <b>${lat} ${north_south}, ${long} ${east_west}</b>`); 
         }
     }).addTo(quake_layer);
     quake_layer.addTo(quake_map);
@@ -154,13 +164,22 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
     tectonic_layer.addTo(quake_map);
 }
 
-/**
- * Function to style the earthquake markers
- * @param {*} feature 
- * @returns 
- */
+/*
+███╗   ███╗ █████╗ ██████╗ ██╗  ██╗███████╗██████╗ 
+████╗ ████║██╔══██╗██╔══██╗██║ ██╔╝██╔════╝██╔══██╗
+██╔████╔██║███████║██████╔╝█████╔╝ █████╗  ██████╔╝
+██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗ ██╔══╝  ██╔══██╗
+██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██╗███████╗██║  ██║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+                                                   
+███████╗████████╗██╗   ██╗██╗     ███████╗         
+██╔════╝╚══██╔══╝╚██╗ ██╔╝██║     ██╔════╝         
+███████╗   ██║    ╚████╔╝ ██║     █████╗           
+╚════██║   ██║     ╚██╔╝  ██║     ██╔══╝           
+███████║   ██║      ██║   ███████╗███████╗         
+╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝         
+*/
  function dataStyle(feature){
-
     return {
         opacity: 0.7,
         fillOpacity: 0.7,
@@ -170,13 +189,22 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
         weight: 0.5,
         stroke: true
     }
-
 }
 
-/**
- * Function to determine the color depending on the depth of the earth quake
- * @param {*} depth 
- * @returns 
+/*
+███╗   ███╗ █████╗ ██████╗ ██╗  ██╗███████╗██████╗ 
+████╗ ████║██╔══██╗██╔══██╗██║ ██╔╝██╔════╝██╔══██╗
+██╔████╔██║███████║██████╔╝█████╔╝ █████╗  ██████╔╝
+██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗ ██╔══╝  ██╔══██╗
+██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██╗███████╗██║  ██║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+                                                   
+ ██████╗ ██████╗ ██╗      ██████╗ ██████╗          
+██╔════╝██╔═══██╗██║     ██╔═══██╗██╔══██╗         
+██║     ██║   ██║██║     ██║   ██║██████╔╝         
+██║     ██║   ██║██║     ██║   ██║██╔══██╗         
+╚██████╗╚██████╔╝███████╗╚██████╔╝██║  ██║         
+ ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝    
  */
  function dataColor(depth){
     if (depth > 90) return "#ffffb2";
@@ -187,11 +215,21 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
     else return "#bd0026";
 }
 
-/**
- * Function to determine the radius of the marker depending on the magnitude of the earthquake
- * @param {*} magnitude 
- * @returns 
- */
+/*
+███╗   ███╗ █████╗ ██████╗ ██╗  ██╗███████╗██████╗ 
+████╗ ████║██╔══██╗██╔══██╗██║ ██╔╝██╔════╝██╔══██╗
+██╔████╔██║███████║██████╔╝█████╔╝ █████╗  ██████╔╝
+██║╚██╔╝██║██╔══██║██╔══██╗██╔═██╗ ██╔══╝  ██╔══██╗
+██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██╗███████╗██║  ██║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+                                                   
+██████╗  █████╗ ██████╗ ██╗██╗   ██╗███████╗       
+██╔══██╗██╔══██╗██╔══██╗██║██║   ██║██╔════╝       
+██████╔╝███████║██║  ██║██║██║   ██║███████╗       
+██╔══██╗██╔══██║██║  ██║██║██║   ██║╚════██║       
+██║  ██║██║  ██║██████╔╝██║╚██████╔╝███████║       
+╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝ ╚═════╝ ╚══════╝  
+*/
  function radiusSize(magnitude){
     if (magnitude == 0) return 1; //to make sure a 0 mag earthquake shows up
     else return magnitude * 5;
