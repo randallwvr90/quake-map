@@ -58,12 +58,10 @@ function initialize()
     let tectonic_layer = new L.LayerGroup();
     let quake_layer = new L.layerGroup();
     d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(tectonic_json => {
-        //let tectonic_layer = new L.LayerGroup();
         draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map);
     });
     d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(quake_json => {
         draw_quake_markers(quake_json, quake_layer, quake_map);
-        console.log(quake_json);
     });
 
     // add quake and plate check boxes to the layer control
@@ -130,7 +128,7 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
             lat = Math.abs(lat).toFixed(1);
             long = Math.abs(long).toFixed(1);
             layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
-                            Depth:<b>${feature.geometry.coordinates[2]}</b><br>
+                            Depth: <b>${feature.geometry.coordinates[2]}</b><br>
                             Location: <b>${feature.properties.place}</b><br>
                             Coordinates: <b>${lat} ${north_south}, ${long} ${east_west}</b>`); 
         }
@@ -155,7 +153,6 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
 */
 function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
 {
-    //console.log(tectonic_json);
     // Load the data using geoJSON and add to the tectonic plate layers
     L.geoJson(tectonic_json, {
         color: "red",
