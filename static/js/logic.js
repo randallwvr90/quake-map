@@ -49,28 +49,28 @@ function initialize()
     let base_map = {Default: default_map, GrayScale: gray_scale, OpenTopoMap:topoMap};
 
     // create map object
-    var quake_map = L.map("map", {center: [35, -120], zoom: 5, layers: [gray_scale, default_map, topoMap]});
+    var quake_map = L.map("map", {center: [36, 138], zoom: 3, layers: [gray_scale, default_map, topoMap]});
 
     // add the default map to the map
     default_map.addTo(quake_map);
-
+    let tectonic_layer = new L.LayerGroup();
+    let quake_layer = new L.layerGroup();
     // draw tectonic plates
-    let tectonic_plates  = new L.layerGroup();
-    let tectonic_json = d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json")
-    draw_tectonic_plates(tectonic_json);
+    d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(tectonic_json => {
+        //let tectonic_layer = new L.LayerGroup();
+        draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map);
+    });
 
-    //let quake_layer = new L.layerGroup();
+    // draw quakes
     d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(quake_json => {
-        let quake_layer = new L.layerGroup();
         draw_quake_markers(quake_json, quake_layer, quake_map);
     });
-    //draw_quake_markers(quake_json, quake_layer);
 
-    /* let overlays = { 
-        "Tectonic Plates": tectonic_plates,
+    let overlays = {
+        "Tectonic Plates": tectonic_layer,
         "Earthquakes": quake_layer
     }
-    L.control.layers(base_map, overlays).addTo(quake_map); */
+    L.control.layers(base_map, overlays).addTo(quake_map);
 
     // add legend
     let legend  = L.control({
@@ -83,7 +83,8 @@ function initialize()
         let intervals = [-10, 10, 30, 50, 70, 90];
         // I chose a sequential, multi-hue color scheme (I didn't like green to red because green indicates "good"
         // to me and I don't think earthquakes are particularly good lol)
-        let colors = ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#e34a33", "#b30000"];
+        let colors = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"];
+        div.innerHTML += "<strong>Earthquake Depth</strong><hr>"
         for (var i = 0; i < intervals.length; i++){
             div.innerHTML += "<i style=background:"
                     + colors[i] 
@@ -113,50 +114,18 @@ function initialize()
 */
 function draw_quake_markers(quake_json, quake_layer, quake_map)
 {
-    try {
-        L.geoJson(quake_json, {
-            pointToLayer: function(feature, latLng) {
-                return L.circleMarker(latLng);
-            },
-            style: dataStyle,
-            onEachFeature: function(feature, layer){
-                layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
-                                Depth:<b>${feature.geometry.coordinates[2]}</b><br>
-                                Location: <b>${feature.properties.place}</b>`);
-            }
-        }).addTo(quake_layer);
-        quake_layer.addTo(quake_map);
-    }
-    catch (error) {
-        console.error(error);
-    }
-
-
-
-
-
-    /* // plot circle where the radius is dependent on the magnitude and the color on depth
-    // draw earthquake markers
-    let quakes  = new L.layerGroup();
-    //add the geoJson
     L.geoJson(quake_json, {
-        // make each feature a marker that is on the map, each marker is a circle
-        pointToLayer: function(latlng){
-            return L.circleMarker(latlng);
+        pointToLayer: function(feature, latLng) {
+            return L.circleMarker(latLng);
         },
-        //set the style for each marker
-        style: dataStyle, //Calls the datastyle function and passes in the earthquaake data
-        //add popups
+        style: dataStyle,
         onEachFeature: function(feature, layer){
             layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
-                            Depth: <b>${feature.geometry.coordinates[2]}</b><br>
-                            Location: <b>${feature.properties.place}</b>`)
+                            Depth:<b>${feature.geometry.coordinates[2]}</b><br>
+                            Location: <b>${feature.properties.place}</b>`);
         }
-
-    }).addTo(quakes); 
-
-    //Add the earthquake layer
-    quakes.addTo(myMap);*/
+    }).addTo(quake_layer);
+    quake_layer.addTo(quake_map);
 }
 
 /*
@@ -174,9 +143,15 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
 ██║     ███████╗██║  ██║   ██║   ███████╗███████║                                  
 ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
 */
-function draw_tectonic_plates(tectonic_json)
+function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
 {
-    console.log(tectonic_json);
+    //console.log(tectonic_json);
+    // Load the data using geoJSON and add to the tectonic plate layers
+    L.geoJson(tectonic_json, {
+        color: "red",
+        weight: 2
+    }).addTo(tectonic_layer);
+    tectonic_layer.addTo(quake_map);
 }
 
 /**
@@ -187,8 +162,8 @@ function draw_tectonic_plates(tectonic_json)
  function dataStyle(feature){
 
     return {
-        opacity: 0.5,
-        fillOpacity: 0.5,
+        opacity: 0.7,
+        fillOpacity: 0.7,
         fillColor: dataColor(feature.geometry.coordinates[2]),
         color: "000000",  //outline color
         radius: radiusSize(feature.properties.mag),
@@ -204,12 +179,12 @@ function draw_tectonic_plates(tectonic_json)
  * @returns 
  */
  function dataColor(depth){
-    if (depth > 90) return "#fef0d9";
-    else if (depth > 70) return "#fdd49e";
-    else if (depth > 50) return "#fdbb84";
-    else if (depth > 30) return "#fc8d59";
-    else if (depth > 10) return "#e34a33";
-    else return "#b30000";
+    if (depth > 90) return "#ffffb2";
+    else if (depth > 70) return "#fed976";
+    else if (depth > 50) return "#feb24c";
+    else if (depth > 30) return "#fd8d3c";
+    else if (depth > 10) return "#f03b20";
+    else return "#bd0026";
 }
 
 /**
