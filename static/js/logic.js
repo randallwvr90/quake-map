@@ -83,7 +83,7 @@ function initialize()
         // I chose a sequential, multi-hue color scheme (I didn't like green to red because green indicates "good"
         // to me and I don't think earthquakes are particularly good lol)
         let colors = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"];
-        div.innerHTML += "<strong>Earthquake Depth</strong><hr>"
+        div.innerHTML += "<strong>Earthquake Depth (km)</strong><hr>"
         for (var i = 0; i < intervals.length; i++){
             div.innerHTML += "<i style=background:"
                     + colors[i] 
@@ -127,10 +127,10 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
             if (long < 0) {east_west = "west";}
             lat = Math.abs(lat).toFixed(1);
             long = Math.abs(long).toFixed(1);
-            layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
-                            Depth: <b>${feature.geometry.coordinates[2]}</b><br>
-                            Location: <b>${feature.properties.place}</b><br>
-                            Coordinates: <b>${lat} ${north_south}, ${long} ${east_west}</b>`); 
+            layer.bindPopup(`Magnitude: <strong>${feature.properties.mag}</strong><br>
+                            Depth: <strong>${feature.geometry.coordinates[2]} km</strong><br>
+                            Location: <strong>${feature.properties.place}</strong><br>
+                            Coordinates: <strong>${lat}&#176; ${north_south}, ${long}&#176; ${east_west}</strong>`); 
         }
     }).addTo(quake_layer);
     quake_layer.addTo(quake_map);
@@ -181,7 +181,7 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
         opacity: 0.7,
         fillOpacity: 0.7,
         fillColor: dataColor(feature.geometry.coordinates[2]),
-        color: "000000",  //outline color
+        color: "000000",
         radius: radiusSize(feature.properties.mag),
         weight: 0.5,
         stroke: true
@@ -228,7 +228,7 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
 ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝ ╚═════╝ ╚══════╝  
 */
  function radiusSize(magnitude){
-    if (magnitude == 0) return 1; //to make sure a 0 mag earthquake shows up
+    if (magnitude == 0) return 1; // ensure that a mag 0 earthquake shows up - ...do these exist?
     else return magnitude * 5;
 }
 
