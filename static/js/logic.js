@@ -113,12 +113,14 @@ function initialize()
 */
 function draw_quake_markers(quake_json, quake_layer, quake_map)
 {
+    console.log(quake_json);
     L.geoJson(quake_json, {
         pointToLayer: function(feature, latLng) {
             return L.circleMarker(latLng);
         },
         style: dataStyle,
         onEachFeature: function(feature, layer){
+            // get the coordinates and make them pretty for the popup
             let lat = feature.geometry.coordinates[1];
             let long = feature.geometry.coordinates[0];
             let north_south = "north";
@@ -127,10 +129,14 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
             if (long < 0) {east_west = "west";}
             lat = Math.abs(lat).toFixed(1);
             long = Math.abs(long).toFixed(1);
+            // convert the unix timestamp to a Date object, which has a built-in string representation, used in bindPopup
+            unix_timestamp = feature.properties.time;
+            var date = new Date(unix_timestamp);
             layer.bindPopup(`Magnitude: <strong>${feature.properties.mag}</strong><br>
                             Depth: <strong>${feature.geometry.coordinates[2]} km</strong><br>
                             Location: <strong>${feature.properties.place}</strong><br>
-                            Coordinates: <strong>${lat}&#176; ${north_south}, ${long}&#176; ${east_west}</strong>`); 
+                            Coordinates: <strong>${lat}&#176; ${north_south}, ${long}&#176; ${east_west}</strong><br>
+                            Date & Time: <strong>${date}</strong>`);
         }
     }).addTo(quake_layer);
     quake_layer.addTo(quake_map);
