@@ -211,21 +211,12 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
  ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝    
  */
  function markerColor(depth){
-     if (depth == 6.27) 
-        console.log("sup");
      if (depth <10) return "#ffffb2";
      else if (depth >= 10 && depth < 30) return "#fed976";
      else if (depth >= 30 && depth < 50) return "#feb24c";
      else if (depth >= 50 && depth < 70) return "#fd8d3c";
      else if (depth >= 70 && depth < 90) return "#f03b20";
      else if (depth >= 90) return "#bd0026";
-     else return "#000000"
-    /* if (depth > 900) return "#ffffb2";
-    else if (depth > 700) return "#fed976";
-    else if (depth > 500) return "#feb24c";
-    else if (depth > 300) return "#fd8d3c";
-    else if (depth > 100) return "#f03b20";
-    else return "#bd0026"; */
 }
 
 /*
