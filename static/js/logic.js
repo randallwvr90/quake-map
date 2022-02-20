@@ -49,7 +49,7 @@ function initialize()
     let base_map = {Default: default_map, GrayScale: gray_scale, OpenTopoMap:topoMap};
 
     // create map object
-    var quake_map = L.map("map", {center: [36, 138], zoom: 4, layers: [topoMap, gray_scale, default_map]});
+    var quake_map = L.map("map", {center: [35.8, -97.3]/* [36, 138] */, zoom: 8, layers: [topoMap, gray_scale, default_map]});
 
     // add the default map to the map
     default_map.addTo(quake_map);
@@ -116,7 +116,8 @@ function draw_quake_markers(quake_json, quake_layer, quake_map)
     console.log(quake_json);
     L.geoJson(quake_json, {
         pointToLayer: function(feature, latLng) {
-            return L.circleMarker(latLng);
+            let myLatLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+            return L.circleMarker(myLatLng);
         },
         style: dataStyle,
         onEachFeature: function(feature, layer){
@@ -183,15 +184,15 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
 ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝         
 */
  function dataStyle(feature){
-    return {
+     let style = {
         opacity: 0.7,
         fillOpacity: 0.7,
-        fillColor: dataColor(feature.geometry.coordinates[2]),
-        color: "000000",
+        fillColor: markerColor(feature.geometry.coordinates[2]),
         radius: radiusSize(feature.properties.mag),
         weight: 0.5,
         stroke: true
-    }
+    };
+    return style;
 }
 
 /*
@@ -209,13 +210,22 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
 ╚██████╗╚██████╔╝███████╗╚██████╔╝██║  ██║         
  ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝    
  */
- function dataColor(depth){
-    if (depth > 90) return "#ffffb2";
-    else if (depth > 70) return "#fed976";
-    else if (depth > 50) return "#feb24c";
-    else if (depth > 30) return "#fd8d3c";
-    else if (depth > 10) return "#f03b20";
-    else return "#bd0026";
+ function markerColor(depth){
+     if (depth == 6.27) 
+        console.log("sup");
+     if (depth <10) return "#ffffb2";
+     else if (depth >= 10 && depth < 30) return "#fed976";
+     else if (depth >= 30 && depth < 50) return "#feb24c";
+     else if (depth >= 50 && depth < 70) return "#fd8d3c";
+     else if (depth >= 70 && depth < 90) return "#f03b20";
+     else if (depth >= 90) return "#bd0026";
+     else return "#000000"
+    /* if (depth > 900) return "#ffffb2";
+    else if (depth > 700) return "#fed976";
+    else if (depth > 500) return "#feb24c";
+    else if (depth > 300) return "#fd8d3c";
+    else if (depth > 100) return "#f03b20";
+    else return "#bd0026"; */
 }
 
 /*
