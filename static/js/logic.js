@@ -83,13 +83,13 @@ function initialize()
         // I chose a sequential, multi-hue color scheme (I didn't like green to red because green indicates "good"
         // to me and I don't think earthquakes are particularly good lol)
         let colors = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"];
-        div.innerHTML += "<strong>Earthquake Depth (km)</strong><hr>"
+        div.innerHTML += "<strong>Earthquake Depth (m)</strong><hr>"
         for (var i = 0; i < intervals.length; i++){
             div.innerHTML += "<i style=background:"
                     + colors[i] 
                     + "></i>"
                     + intervals[i]
-                    + (intervals[i+1] ? "km &ndash; " + intervals[i+1] + "km" + "<br>" : "+");
+                    + (intervals[i+1] ? "m &ndash; " + intervals[i+1] + "m" + "<br>" : "+");
         }
         return div;
     };
