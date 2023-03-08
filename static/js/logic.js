@@ -40,7 +40,7 @@ function initialize()
     let base_map = {Default: default_map, GrayScale: gray_scale, OpenTopoMap:topoMap};
 
     // create map object
-    var quake_map = L.map("map", {center: [35.8, -97.3]/* [36, 138] */, zoom: 8, layers: [topoMap, gray_scale, default_map]});
+    var quake_map = L.map("map", {center: [15, -94], zoom: 4, layers: [topoMap, gray_scale, default_map]});
 
     // add the default map to the map
     default_map.addTo(quake_map);
@@ -156,7 +156,8 @@ function draw_tectonic_plates(tectonic_json, tectonic_layer, quake_map)
         color: "red",
         weight: 2
     }).addTo(tectonic_layer);
-    tectonic_layer.addTo(quake_map);
+    // Don't show the tectonic plates when the page is first opened. 
+    //tectonic_layer.addTo(quake_map);
 }
 
 /*
