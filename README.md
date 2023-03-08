@@ -1,5 +1,5 @@
 # leaflet-challenge
-Web Mapping homework for Data Science Bootcamp!
+Mapping global earthquakes from the past 7 days. 
 
 ## Table of Contents
 * [Background](#background)
